@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#050711">
+  <title>NOVA STRIKE — Survive the swarm. Become the legend.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"></span><span>NOVA STRIKE</span></div>
+      <div class="top-status"><span class="status-dot"></span> MISSION ACTIVE <span class="sector">SECTOR 07</span></div>
+      <button id="pauseBtn" class="icon-btn" aria-label="Pause mission">Ⅱ</button>
+    </header>
+
+    <section class="game-frame" aria-label="NOVA STRIKE game">
+      <canvas id="game" aria-label="Space shooter canvas"></canvas>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+
+      <div id="hud" class="hud hidden">
+        <div class="hud-block score-block">
+          <span class="eyebrow">SCORE</span><strong id="score">000000</strong>
+          <span class="sub">BEST <b id="highScore">000000</b></span>
+        </div>
+        <div class="hud-center">
+          <div class="level-readout"><span>LV</span><b id="level">01</b></div>
+          <div class="progress"><i id="levelProgress"></i></div>
+          <div id="combo" class="combo">COMBO x1</div>
+        </div>
+        <div class="hud-block health-block">
+          <div class="health-head"><span class="eyebrow">HULL</span><b id="healthText">100%</b></div>
+          <div class="healthbar"><i id="healthBar"></i></div>
+          <div id="powerups" class="powerups"></div>
+        </div>
+      </div>
+
+      <div id="bossHud" class="boss-hud hidden">
+        <div class="boss-name"><span>⚠</span> VOID REAPER <span>⚠</span></div>
+        <div class="bossbar"><i id="bossBar"></i></div>
+      </div>
+
+      <div id="centerMessage" class="center-message"></div>
+
+      <section id="startScreen" class="overlay">
+        <div class="title-orbit orbit-a"></div><div class="title-orbit orbit-b"></div>
+        <div class="title-wrap">
+          <div class="micro">NOVA COMMAND // FLIGHT SYSTEM 7.2</div>
+          <h1>NOVA<span>STRIKE</span></h1>
+          <p class="tagline">SURVIVE THE SWARM. <b>BECOME THE LEGEND.</b></p>
+          <div class="launch-meta">
+            <div><span>MOVE</span><b>A / D&nbsp;&nbsp;or&nbsp;&nbsp;← / →</b></div>
+            <div><span>FIRE</span><b>SPACE</b></div>
+            <div><span>PAUSE</span><b>P</b></div>
+          </div>
+          <button id="launchBtn" class="launch-btn"><span>LAUNCH MISSION</span><i>→</i></button>
+          <div class="record">GALACTIC RECORD <b id="startHighScore">000000</b></div>
+        </div>
+        <div class="crosshair c1"></div><div class="crosshair c2"></div>
+      </section>
+
+      <section id="pauseScreen" class="overlay hidden">
+        <div class="panel">
+          <div class="micro">FLIGHT SYSTEM // STANDBY</div>
+          <h2>MISSION PAUSED</h2>
+          <p>Weapons safed. Threat field frozen.</p>
+          <div class="panel-actions">
+            <button id="resumeBtn" class="primary-btn">RESUME MISSION</button>
+            <button id="pauseRestartBtn" class="secondary-btn">RESTART</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="gameOverScreen" class="overlay hidden">
+        <div class="panel failure">
+          <div class="signal">SIGNAL LOST</div>
+          <h2>MISSION FAILED</h2>
+          <div class="results">
+            <div><span>FINAL SCORE</span><b id="finalScore">000000</b></div>
+            <div><span>LEVEL</span><b id="finalLevel">01</b></div>
+            <div><span>BEST COMBO</span><b id="finalCombo">x1</b></div>
+          </div>
+          <div id="newRecord" class="record-badge hidden">★ NEW GALACTIC RECORD ★</div>
+          <button id="redeployBtn" class="launch-btn">REDEPLOY <i>→</i></button>
+        </div>
+      </section>
+
+      <div id="touchControls" class="touch-controls">
+        <button data-key="left" aria-label="Move left">←</button>
+        <button data-key="fire" aria-label="Fire">FIRE</button>
+        <button data-key="right" aria-label="Move right">→</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>WING SYSTEM // NS-07</span>
+      <span>WEB AUDIO ONLINE</span>
+      <span>LOCAL RECORD STORAGE</span>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

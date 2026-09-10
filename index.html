@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NOVA STRIKE — Arcade Space Combat</title>
+    <title>NOVA STRIKE — Cyber Archery Combat</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app-viewport">
-        <!-- Main Game Container -->
         <div id="game-container">
             <canvas id="gameCanvas"></canvas>
             
-            <!-- Scanline / Vignette Overlay -->
             <div class="crt-overlay"></div>
             <div id="damage-flash" class="damage-flash"></div>
 
@@ -39,25 +37,29 @@
                             <div id="health-bar-fill" class="health-bar-fill"></div>
                         </div>
                     </div>
-                    <div class="stat-row active-buffs-row" id="buffs-container">
-                        <!-- Dynamic active powerup badges -->
+                    <div class="stat-row">
+                        <span class="hud-label">EMP [E]</span>
+                        <div class="emp-bar-wrapper">
+                            <div id="emp-bar-fill" class="emp-bar-fill"></div>
+                        </div>
                     </div>
+                    <div class="stat-row active-buffs-row" id="buffs-container"></div>
                 </div>
             </div>
 
-            <!-- Floating Announcements & Combo -->
+            <!-- Notifications & Combo -->
             <div id="hud-notifications" class="hud-layer pointer-events-none">
                 <div id="combo-display" class="combo-banner hidden">
                     <span id="combo-count">2x</span>
                     <span class="combo-sub">COMBO</span>
                 </div>
                 <div id="announcement-banner" class="announcement-banner hidden">
-                    <h2 id="announcement-title">LEVEL UP</h2>
-                    <p id="announcement-sub">SECTOR 02 REACHED</p>
+                    <h2 id="announcement-title">SECTOR 01</h2>
+                    <p id="announcement-sub">ENGAGING TARGETS</p>
                 </div>
             </div>
 
-            <!-- Boss Health Overlay -->
+            <!-- Boss HUD -->
             <div id="boss-hud" class="boss-hud hidden">
                 <div class="boss-title-row">
                     <span class="boss-warning-blink">⚠ WARNING:</span>
@@ -68,7 +70,7 @@
                 </div>
             </div>
 
-            <!-- Start Screen Overlay -->
+            <!-- Start Screen -->
             <div id="start-screen" class="overlay-screen active">
                 <div class="glass-panel main-panel">
                     <div class="title-glow">NOVA STRIKE</div>
@@ -76,22 +78,21 @@
                     
                     <div class="control-hints">
                         <div class="hint-card">
-                            <span class="key-cap">A</span><span class="key-cap">D</span> or <span class="key-cap">←</span><span class="key-cap">→</span>
-                            <span class="hint-desc">MANEUVER</span>
+                            <span class="key-cap">A</span><span class="key-cap">D</span> / <span class="key-cap">←</span><span class="key-cap">→</span>
+                            <span class="hint-desc">MOVE</span>
                         </div>
                         <div class="hint-card">
                             <span class="key-cap wide">SPACE</span>
-                            <span class="hint-desc">PLASMA FIRE</span>
+                            <span class="hint-desc">BOW SHOT</span>
                         </div>
                         <div class="hint-card">
-                            <span class="key-cap">P</span>
-                            <span class="hint-desc">PAUSE</span>
+                            <span class="key-cap">E</span>
+                            <span class="hint-desc">EMP BLAST</span>
                         </div>
                     </div>
 
                     <button id="btn-start" class="btn-primary">
                         <span class="btn-text">LAUNCH MISSION</span>
-                        <span class="btn-glow"></span>
                     </button>
                     
                     <div class="top-score-badge">
@@ -100,7 +101,7 @@
                 </div>
             </div>
 
-            <!-- Pause Screen Overlay -->
+            <!-- Pause Screen -->
             <div id="pause-screen" class="overlay-screen hidden">
                 <div class="glass-panel dialog-panel">
                     <h2>MISSION PAUSED</h2>
@@ -112,7 +113,7 @@
                 </div>
             </div>
 
-            <!-- Game Over Screen Overlay -->
+            <!-- Game Over Screen -->
             <div id="gameover-screen" class="overlay-screen hidden">
                 <div class="glass-panel dialog-panel">
                     <div class="critical-text">SIGNAL LOST</div>
@@ -137,15 +138,14 @@
 
                     <button id="btn-restart" class="btn-primary">
                         <span class="btn-text">REDEPLOY SHIP</span>
-                        <span class="btn-glow"></span>
                     </button>
                 </div>
             </div>
 
-            <!-- Touch Controls Overlay (Mobile Only) -->
+            <!-- Touch Controls -->
             <div id="touch-controls" class="touch-layer hidden">
                 <div id="touch-left" class="touch-btn">◀</div>
-                <div id="touch-fire" class="touch-btn action-btn">FIRE</div>
+                <div id="touch-fire" class="touch-btn action-btn">BOW</div>
                 <div id="touch-right" class="touch-btn">▶</div>
             </div>
         </div>

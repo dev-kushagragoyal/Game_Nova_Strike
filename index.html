@@ -1,105 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#050711">
-  <title>NOVA STRIKE — Survive the swarm. Become the legend.</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOVA STRIKE — Arcade Space Combat</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="shell">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark"></span><span>NOVA STRIKE</span></div>
-      <div class="top-status"><span class="status-dot"></span> MISSION ACTIVE <span class="sector">SECTOR 07</span></div>
-      <button id="pauseBtn" class="icon-btn" aria-label="Pause mission">Ⅱ</button>
-    </header>
+    <div id="app-viewport">
+        <!-- Main Game Container -->
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+            
+            <!-- Scanline / Vignette Overlay -->
+            <div class="crt-overlay"></div>
+            <div id="damage-flash" class="damage-flash"></div>
 
-    <section class="game-frame" aria-label="NOVA STRIKE game">
-      <canvas id="game" aria-label="Space shooter canvas"></canvas>
-      <div class="scanlines"></div>
-      <div class="vignette"></div>
+            <!-- Top HUD Bar -->
+            <div id="hud" class="hud-layer hidden">
+                <div class="hud-card hud-score-box">
+                    <span class="hud-label">SCORE</span>
+                    <span id="score-val" class="hud-value neon-cyan">000000</span>
+                    <span class="hud-sublabel">BEST: <span id="high-score-val">0</span></span>
+                </div>
 
-      <div id="hud" class="hud hidden">
-        <div class="hud-block score-block">
-          <span class="eyebrow">SCORE</span><strong id="score">000000</strong>
-          <span class="sub">BEST <b id="highScore">000000</b></span>
+                <div class="hud-card hud-center-box">
+                    <div class="brand-title">NOVA STRIKE</div>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span id="sector-label" class="status-text">SECTOR 01</span>
+                    </div>
+                </div>
+
+                <div class="hud-card hud-stats-box">
+                    <div class="stat-row">
+                        <span class="hud-label">HULL</span>
+                        <div class="health-bar-wrapper">
+                            <div id="health-bar-fill" class="health-bar-fill"></div>
+                        </div>
+                    </div>
+                    <div class="stat-row active-buffs-row" id="buffs-container">
+                        <!-- Dynamic active powerup badges -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Announcements & Combo -->
+            <div id="hud-notifications" class="hud-layer pointer-events-none">
+                <div id="combo-display" class="combo-banner hidden">
+                    <span id="combo-count">2x</span>
+                    <span class="combo-sub">COMBO</span>
+                </div>
+                <div id="announcement-banner" class="announcement-banner hidden">
+                    <h2 id="announcement-title">LEVEL UP</h2>
+                    <p id="announcement-sub">SECTOR 02 REACHED</p>
+                </div>
+            </div>
+
+            <!-- Boss Health Overlay -->
+            <div id="boss-hud" class="boss-hud hidden">
+                <div class="boss-title-row">
+                    <span class="boss-warning-blink">⚠ WARNING:</span>
+                    <span id="boss-name" class="boss-name">VOID REAPER</span>
+                </div>
+                <div class="boss-hp-bar">
+                    <div id="boss-hp-fill" class="boss-hp-fill"></div>
+                </div>
+            </div>
+
+            <!-- Start Screen Overlay -->
+            <div id="start-screen" class="overlay-screen active">
+                <div class="glass-panel main-panel">
+                    <div class="title-glow">NOVA STRIKE</div>
+                    <p class="tagline">SURVIVE THE SWARM. BECOME THE LEGEND.</p>
+                    
+                    <div class="control-hints">
+                        <div class="hint-card">
+                            <span class="key-cap">A</span><span class="key-cap">D</span> or <span class="key-cap">←</span><span class="key-cap">→</span>
+                            <span class="hint-desc">MANEUVER</span>
+                        </div>
+                        <div class="hint-card">
+                            <span class="key-cap wide">SPACE</span>
+                            <span class="hint-desc">PLASMA FIRE</span>
+                        </div>
+                        <div class="hint-card">
+                            <span class="key-cap">P</span>
+                            <span class="hint-desc">PAUSE</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-start" class="btn-primary">
+                        <span class="btn-text">LAUNCH MISSION</span>
+                        <span class="btn-glow"></span>
+                    </button>
+                    
+                    <div class="top-score-badge">
+                        RECORD: <span id="start-high-score">000000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pause Screen Overlay -->
+            <div id="pause-screen" class="overlay-screen hidden">
+                <div class="glass-panel dialog-panel">
+                    <h2>MISSION PAUSED</h2>
+                    <p>TACTICAL OVERVIEW STANDBY</p>
+                    <div class="button-stack">
+                        <button id="btn-resume" class="btn-primary">RESUME MISSION</button>
+                        <button id="btn-restart-pause" class="btn-secondary">ABORT & RESTART</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Over Screen Overlay -->
+            <div id="gameover-screen" class="overlay-screen hidden">
+                <div class="glass-panel dialog-panel">
+                    <div class="critical-text">SIGNAL LOST</div>
+                    <h2>MISSION FAILED</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <span class="res-label">FINAL SCORE</span>
+                            <span id="final-score" class="res-value neon-cyan">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="res-label">SECTOR REACHED</span>
+                            <span id="final-level" class="res-value">1</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="res-label">MAX COMBO</span>
+                            <span id="final-combo" class="res-value">x1</span>
+                        </div>
+                    </div>
+
+                    <div id="new-record-tag" class="record-badge hidden">★ NEW GALACTIC RECORD ★</div>
+
+                    <button id="btn-restart" class="btn-primary">
+                        <span class="btn-text">REDEPLOY SHIP</span>
+                        <span class="btn-glow"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Touch Controls Overlay (Mobile Only) -->
+            <div id="touch-controls" class="touch-layer hidden">
+                <div id="touch-left" class="touch-btn">◀</div>
+                <div id="touch-fire" class="touch-btn action-btn">FIRE</div>
+                <div id="touch-right" class="touch-btn">▶</div>
+            </div>
         </div>
-        <div class="hud-center">
-          <div class="level-readout"><span>LV</span><b id="level">01</b></div>
-          <div class="progress"><i id="levelProgress"></i></div>
-          <div id="combo" class="combo">COMBO x1</div>
-        </div>
-        <div class="hud-block health-block">
-          <div class="health-head"><span class="eyebrow">HULL</span><b id="healthText">100%</b></div>
-          <div class="healthbar"><i id="healthBar"></i></div>
-          <div id="powerups" class="powerups"></div>
-        </div>
-      </div>
+    </div>
 
-      <div id="bossHud" class="boss-hud hidden">
-        <div class="boss-name"><span>⚠</span> VOID REAPER <span>⚠</span></div>
-        <div class="bossbar"><i id="bossBar"></i></div>
-      </div>
-
-      <div id="centerMessage" class="center-message"></div>
-
-      <section id="startScreen" class="overlay">
-        <div class="title-orbit orbit-a"></div><div class="title-orbit orbit-b"></div>
-        <div class="title-wrap">
-          <div class="micro">NOVA COMMAND // FLIGHT SYSTEM 7.2</div>
-          <h1>NOVA<span>STRIKE</span></h1>
-          <p class="tagline">SURVIVE THE SWARM. <b>BECOME THE LEGEND.</b></p>
-          <div class="launch-meta">
-            <div><span>MOVE</span><b>A / D&nbsp;&nbsp;or&nbsp;&nbsp;← / →</b></div>
-            <div><span>FIRE</span><b>SPACE</b></div>
-            <div><span>PAUSE</span><b>P</b></div>
-          </div>
-          <button id="launchBtn" class="launch-btn"><span>LAUNCH MISSION</span><i>→</i></button>
-          <div class="record">GALACTIC RECORD <b id="startHighScore">000000</b></div>
-        </div>
-        <div class="crosshair c1"></div><div class="crosshair c2"></div>
-      </section>
-
-      <section id="pauseScreen" class="overlay hidden">
-        <div class="panel">
-          <div class="micro">FLIGHT SYSTEM // STANDBY</div>
-          <h2>MISSION PAUSED</h2>
-          <p>Weapons safed. Threat field frozen.</p>
-          <div class="panel-actions">
-            <button id="resumeBtn" class="primary-btn">RESUME MISSION</button>
-            <button id="pauseRestartBtn" class="secondary-btn">RESTART</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="gameOverScreen" class="overlay hidden">
-        <div class="panel failure">
-          <div class="signal">SIGNAL LOST</div>
-          <h2>MISSION FAILED</h2>
-          <div class="results">
-            <div><span>FINAL SCORE</span><b id="finalScore">000000</b></div>
-            <div><span>LEVEL</span><b id="finalLevel">01</b></div>
-            <div><span>BEST COMBO</span><b id="finalCombo">x1</b></div>
-          </div>
-          <div id="newRecord" class="record-badge hidden">★ NEW GALACTIC RECORD ★</div>
-          <button id="redeployBtn" class="launch-btn">REDEPLOY <i>→</i></button>
-        </div>
-      </section>
-
-      <div id="touchControls" class="touch-controls">
-        <button data-key="left" aria-label="Move left">←</button>
-        <button data-key="fire" aria-label="Fire">FIRE</button>
-        <button data-key="right" aria-label="Move right">→</button>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <span>WING SYSTEM // NS-07</span>
-      <span>WEB AUDIO ONLINE</span>
-      <span>LOCAL RECORD STORAGE</span>
-    </footer>
-  </main>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

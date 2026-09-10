@@ -32,7 +32,7 @@
 
                 <div class="hud-card hud-stats-box">
                     <div class="stat-row">
-                        <span class="hud-label">HULL</span>
+                        <span class="hud-label">HULL HP</span>
                         <div class="health-bar-wrapper">
                             <div id="health-bar-fill" class="health-bar-fill"></div>
                         </div>
@@ -53,10 +53,6 @@
                     <span id="combo-count">2x</span>
                     <span class="combo-sub">COMBO</span>
                 </div>
-                <div id="announcement-banner" class="announcement-banner hidden">
-                    <h2 id="announcement-title">SECTOR 01</h2>
-                    <p id="announcement-sub">ENGAGING TARGETS</p>
-                </div>
             </div>
 
             <!-- Boss HUD -->
@@ -74,7 +70,7 @@
             <div id="start-screen" class="overlay-screen active">
                 <div class="glass-panel main-panel">
                     <div class="title-glow">NOVA STRIKE</div>
-                    <p class="tagline">SURVIVE THE SWARM. BECOME THE LEGEND.</p>
+                    <p class="tagline">CYBER BOW & ARROW SYSTEM</p>
                     
                     <div class="control-hints">
                         <div class="hint-card">
@@ -83,7 +79,7 @@
                         </div>
                         <div class="hint-card">
                             <span class="key-cap wide">SPACE</span>
-                            <span class="hint-desc">BOW SHOT</span>
+                            <span class="hint-desc">SHOOT ARROW</span>
                         </div>
                         <div class="hint-card">
                             <span class="key-cap">E</span>
@@ -105,7 +101,7 @@
             <div id="pause-screen" class="overlay-screen hidden">
                 <div class="glass-panel dialog-panel">
                     <h2>MISSION PAUSED</h2>
-                    <p>TACTICAL OVERVIEW STANDBY</p>
+                    <p>PRESS P TO RESUME</p>
                     <div class="button-stack">
                         <button id="btn-resume" class="btn-primary">RESUME MISSION</button>
                         <button id="btn-restart-pause" class="btn-secondary">ABORT & RESTART</button>
@@ -116,7 +112,7 @@
             <!-- Game Over Screen -->
             <div id="gameover-screen" class="overlay-screen hidden">
                 <div class="glass-panel dialog-panel">
-                    <div class="critical-text">SIGNAL LOST</div>
+                    <div class="critical-text">HULL DESTROYED</div>
                     <h2>MISSION FAILED</h2>
                     
                     <div class="results-grid">
@@ -134,7 +130,7 @@
                         </div>
                     </div>
 
-                    <div id="new-record-tag" class="record-badge hidden">★ NEW GALACTIC RECORD ★</div>
+                    <div id="new-record-tag" class="record-badge hidden">★ NEW RECORD ★</div>
 
                     <button id="btn-restart" class="btn-primary">
                         <span class="btn-text">REDEPLOY SHIP</span>

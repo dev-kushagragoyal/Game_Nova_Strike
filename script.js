@@ -50,21 +50,21 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(550, this.ctx.currentTime + 0.09);
+                gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.09);
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.08);
+                osc.stop(this.ctx.currentTime + 0.09);
             } catch (e) {}
         }
 
         playExplosion(isLarge = false) {
             if (!this.ctx || this.muted) return;
             try {
-                const dur = isLarge ? 0.5 : 0.25;
+                const dur = isLarge ? 0.45 : 0.22;
                 const bufferSize = this.ctx.sampleRate * dur;
                 const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -74,11 +74,11 @@
 
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(isLarge ? 300 : 600, this.ctx.currentTime);
-                filter.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + dur);
+                filter.frequency.setValueAtTime(isLarge ? 320 : 650, this.ctx.currentTime);
+                filter.frequency.linearRampToValueAtTime(30, this.ctx.currentTime + dur);
 
                 const gain = this.ctx.createGain();
-                gain.gain.setValueAtTime(isLarge ? 0.25 : 0.12, this.ctx.currentTime);
+                gain.gain.setValueAtTime(isLarge ? 0.22 : 0.12, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + dur);
 
                 noise.connect(filter);
@@ -89,12 +89,12 @@
         }
 
         playPowerup() {
-            this.playTone(350, 'sine', 0.1, 0.12);
-            setTimeout(() => this.playTone(700, 'sine', 0.15, 0.12), 60);
+            this.playTone(380, 'sine', 0.1, 0.12);
+            setTimeout(() => this.playTone(720, 'sine', 0.15, 0.12), 60);
         }
 
         playEMP() {
-            this.playTone(800, 'sawtooth', 0.4, 0.2, 0.01);
+            this.playTone(850, 'sawtooth', 0.4, 0.2, 0.01);
         }
     }
 
@@ -113,7 +113,7 @@
 
     let enemySpawnTimer = 0;
     let powerupSpawnTimer = 0;
-    let empCharge = 0; // EMP Gauge
+    let empCharge = 0;
     let activeBoss = null;
 
     const keys = { left: false, right: false, up: false, down: false, fire: false };
@@ -126,7 +126,7 @@
 
         init() {
             this.stars = [];
-            for (let i = 0; i < 120; i++) {
+            for (let i = 0; i < 110; i++) {
                 this.stars.push({
                     x: Math.random() * INTERNAL_WIDTH,
                     y: Math.random() * INTERNAL_HEIGHT,
@@ -268,6 +268,7 @@
         }
 
         update(dt) {
+            // Precise Position Movement (Spacebar state has ZERO side-effect on ship coordinates)
             if (keys.left) this.x -= this.speed * dt;
             if (keys.right) this.x += this.speed * dt;
             if (keys.up) this.y -= this.speed * 0.7 * dt;
@@ -283,11 +284,11 @@
             if (this.doubleScoreTimer > 0) this.doubleScoreTimer -= dt;
             if (this.multiArrowTimer > 0) this.multiArrowTimer -= dt;
 
-            // Bow Draw Animation
+            // Bow Dynamic Draw State
             if (keys.fire) {
-                this.bowDrawAnim = Math.min(1, this.bowDrawAnim + dt * 8);
+                this.bowDrawAnim = Math.min(1.0, this.bowDrawAnim + dt * 10);
             } else {
-                this.bowDrawAnim = Math.max(0, this.bowDrawAnim - dt * 10);
+                this.bowDrawAnim = Math.max(0, this.bowDrawAnim - dt * 12);
             }
 
             const rate = this.rapidFireTimer > 0 ? 0.12 : 0.22;
@@ -296,11 +297,10 @@
                 this.fireCooldown = rate;
             }
 
-            // Engine Trail
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.4) {
                 particles.push(new Particle(
                     this.x, this.y + 20,
-                    (Math.random() - 0.5) * 20, Math.random() * 80 + 100,
+                    (Math.random() - 0.5) * 15, Math.random() * 60 + 80,
                     '#00f3ff', Math.random() * 2 + 1, 0.2
                 ));
             }
@@ -309,14 +309,25 @@
         shoot() {
             audio.playBowRelease();
             
+            // Recoil burst particle
+            for (let i = 0; i < 4; i++) {
+                particles.push(new Particle(
+                    this.x + (Math.random() - 0.5) * 10,
+                    this.y - 15,
+                    (Math.random() - 0.5) * 40,
+                    Math.random() * 40 - 20,
+                    '#ff0078', 2, 0.15
+                ));
+            }
+
             if (this.multiArrowTimer > 0) {
                 // Triple Arrow Volley
-                playerBullets.push(new Arrow(this.x, this.y - 15, -120, -850));
-                playerBullets.push(new Arrow(this.x, this.y - 20, 0, -900));
-                playerBullets.push(new Arrow(this.x, this.y - 15, 120, -850));
+                playerBullets.push(new Arrow(this.x, this.y - 15, -140, -880));
+                playerBullets.push(new Arrow(this.x, this.y - 20, 0, -920));
+                playerBullets.push(new Arrow(this.x, this.y - 15, 140, -880));
             } else {
-                // Single Kinetic Arrow
-                playerBullets.push(new Arrow(this.x, this.y - 20, 0, -900));
+                // Animated Single Kinetic Arrow
+                playerBullets.push(new Arrow(this.x, this.y - 20, 0, -920));
             }
         }
 
@@ -348,38 +359,44 @@
                 ctx.strokeStyle = '#00f3ff';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(0, 0, 30, 0, Math.PI * 2);
+                ctx.arc(0, 0, 32, 0, Math.PI * 2);
                 ctx.stroke();
             }
 
-            // Draw Cyber Bow Shape
+            // Cyber-Bow Art Frame
             ctx.strokeStyle = this.hitFlash > 0 ? '#ff2a2a' : '#00f3ff';
             ctx.lineWidth = 3;
 
-            // Bow Limbs
-            const pullBack = this.bowDrawAnim * 8;
+            const pullBack = this.bowDrawAnim * 10;
+            
+            // Outer Bow Arc
             ctx.beginPath();
-            ctx.moveTo(-28, 8);
-            ctx.quadraticCurveTo(0, -18, 28, 8);
+            ctx.moveTo(-30, 6);
+            ctx.quadraticCurveTo(0, -22, 30, 6);
             ctx.stroke();
 
-            // Bow String
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.lineWidth = 1;
+            // Energy Bow String
+            ctx.strokeStyle = 'rgba(255, 0, 120, 0.85)';
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(-28, 8);
-            ctx.lineTo(0, 10 + pullBack);
-            ctx.lineTo(28, 8);
+            ctx.moveTo(-30, 6);
+            ctx.lineTo(0, 8 + pullBack);
+            ctx.lineTo(30, 6);
             ctx.stroke();
 
-            // Arrow Nocked Visual
-            if (this.bowDrawAnim > 0.1) {
-                ctx.strokeStyle = '#ff0078';
+            // Loaded Arrow Shaft Indicator
+            if (this.bowDrawAnim > 0.05) {
+                ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(0, 10 + pullBack);
-                ctx.lineTo(0, -16);
+                ctx.moveTo(0, 8 + pullBack);
+                ctx.lineTo(0, -18);
                 ctx.stroke();
+
+                ctx.fillStyle = '#ff0078';
+                ctx.beginPath();
+                ctx.arc(0, -18, 3, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             ctx.restore();
@@ -393,36 +410,61 @@
             this.x = x; this.y = y; this.vx = vx; this.vy = vy;
             this.radius = 3;
             this.markedForDeletion = false;
+            this.length = 22;
         }
 
         update(dt) {
             this.x += this.vx * dt;
             this.y += this.vy * dt;
 
-            // Arrow Particles
-            if (Math.random() < 0.6) {
-                particles.push(new Particle(this.x, this.y + 8, 0, 40, '#ff0078', 1.5, 0.15));
+            // Animated Arrow Energy Trail Particles
+            if (Math.random() < 0.75) {
+                particles.push(new Particle(
+                    this.x + (Math.random() - 0.5) * 2,
+                    this.y + 10,
+                    0, 50,
+                    '#ff0078', 1.5, 0.12
+                ));
             }
 
-            if (this.y < -20 || this.y > INTERNAL_HEIGHT + 20 || this.x < -20 || this.x > INTERNAL_WIDTH + 20) {
+            if (this.y < -30 || this.y > INTERNAL_HEIGHT + 30 || this.x < -30 || this.x > INTERNAL_WIDTH + 30) {
                 this.markedForDeletion = true;
             }
         }
 
         draw(ctx) {
             ctx.save();
+            ctx.translate(this.x, this.y);
+
+            const angle = Math.atan2(this.vy, this.vx) + Math.PI / 2;
+            ctx.rotate(angle);
+
+            // Arrow Shaft Energy Line
             ctx.strokeStyle = '#ff0078';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(this.x, this.y + 12);
-            ctx.lineTo(this.x, this.y - 10);
+            ctx.moveTo(0, this.length / 2);
+            ctx.lineTo(0, -this.length / 2);
             ctx.stroke();
 
-            // Arrow Head
+            // Glowing Kinetic Head
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(this.x, this.y - 10, 2.5, 0, Math.PI * 2);
+            ctx.moveTo(0, -this.length / 2 - 4);
+            ctx.lineTo(-4, -this.length / 2 + 2);
+            ctx.lineTo(4, -this.length / 2 + 2);
+            ctx.closePath();
             ctx.fill();
+
+            // Energy Fletching Flaps
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-3, this.length / 2 - 2);
+            ctx.lineTo(0, this.length / 2);
+            ctx.lineTo(3, this.length / 2 - 2);
+            ctx.stroke();
+
             ctx.restore();
         }
     }
@@ -463,13 +505,13 @@
 
             if (type === 'DRONE') {
                 this.width = 28; this.height = 28;
-                this.speed = 110; this.hp = 1; this.scoreVal = 10; this.color = '#00f3ff';
+                this.speed = 100; this.hp = 1; this.scoreVal = 10; this.color = '#00f3ff';
             } else if (type === 'STRIKER') {
                 this.width = 32; this.height = 32;
-                this.speed = 150; this.hp = 2; this.scoreVal = 25; this.color = '#ff0078';
+                this.speed = 140; this.hp = 2; this.scoreVal = 25; this.color = '#ff0078';
             } else if (type === 'CRUISER') {
                 this.width = 44; this.height = 44;
-                this.speed = 80; this.hp = 5; this.scoreVal = 60; this.color = '#9d00ff';
+                this.speed = 75; this.hp = 5; this.scoreVal = 60; this.color = '#9d00ff';
                 this.shootTimer = 2.0;
             }
         }
@@ -479,20 +521,20 @@
             this.y += this.speed * dt;
 
             if (this.type === 'DRONE') {
-                this.x += Math.sin(this.timeAlive * 3) * 40 * dt;
+                this.x += Math.sin(this.timeAlive * 3) * 35 * dt;
             } else if (this.type === 'CRUISER') {
                 this.shootTimer -= dt;
                 if (this.shootTimer <= 0) {
-                    enemyBullets.push(new EnemyBullet(this.x, this.y + 20, 0, 220));
+                    enemyBullets.push(new EnemyBullet(this.x, this.y + 20, 0, 210));
                     this.shootTimer = 2.5;
                 }
             }
 
-            // CRITICAL FIX: Hull damage when enemy passes ship uncaught
+            // HULL DAMAGE WHEN ENEMY IS MISSED / SLIPS PAST
             if (this.y > INTERNAL_HEIGHT + 30) {
                 this.markedForDeletion = true;
-                player.takeDamage(8); // Hull damaged for missing enemy
-                floatingTexts.push(new FloatingText(this.x, INTERNAL_HEIGHT - 40, 'MISSED!', '#ff2a2a'));
+                player.takeDamage(6); // Subtracts hull HP on miss
+                floatingTexts.push(new FloatingText(this.x, INTERNAL_HEIGHT - 50, '-6 HULL', '#ff2a2a'));
             }
         }
 
@@ -697,7 +739,7 @@
         if (activeBoss) return;
 
         enemySpawnTimer += dt;
-        const spawnInterval = Math.max(1.0, 2.8 - (level * 0.15));
+        const spawnInterval = Math.max(1.2, 3.0 - (level * 0.12));
 
         if (enemySpawnTimer >= spawnInterval) {
             enemySpawnTimer = 0;
@@ -925,13 +967,17 @@
         setGameState(STATES.PLAYING);
     }
 
+    // Explicit Key Handlers preventing default browser actions on Space/Arrows
     window.addEventListener('keydown', e => {
         audio.init();
-        if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true;
-        if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = true;
-        if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.up = true;
-        if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.down = true;
-        if (e.code === 'Space') keys.fire = true;
+        if (e.code === 'Space') {
+            e.preventDefault();
+            keys.fire = true;
+        }
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') { e.preventDefault(); keys.left = true; }
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') { e.preventDefault(); keys.right = true; }
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') { e.preventDefault(); keys.up = true; }
+        if (e.code === 'KeyS' || e.code === 'ArrowDown') { e.preventDefault(); keys.down = true; }
         if (e.code === 'KeyE') triggerEMP();
 
         if (e.code === 'KeyP') {
@@ -941,11 +987,14 @@
     });
 
     window.addEventListener('keyup', e => {
-        if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false;
-        if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false;
-        if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.up = false;
-        if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.down = false;
-        if (e.code === 'Space') keys.fire = false;
+        if (e.code === 'Space') {
+            e.preventDefault();
+            keys.fire = false;
+        }
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') { e.preventDefault(); keys.left = false; }
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') { e.preventDefault(); keys.right = false; }
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') { e.preventDefault(); keys.up = false; }
+        if (e.code === 'KeyS' || e.code === 'ArrowDown') { e.preventDefault(); keys.down = false; }
     });
 
     const bindTouch = (id, keyName) => {
